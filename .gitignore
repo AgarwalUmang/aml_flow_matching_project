@@ -1,9 +1,6 @@
 data/
 evaluate_with_kid.py
 evaluate_models_fixed.py
-train_cfm.py
-train_ddpm.py
-train_mean.py
 evaluate.py
 CFM.ipynb
 DDPM.ipynb
