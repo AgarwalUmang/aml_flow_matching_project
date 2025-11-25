@@ -16,12 +16,12 @@ import os
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
-# 2. Get the parent folder (The root of your project)
+# Get the parent folder (The root of your project)
 parent_dir = os.path.dirname(current_dir)
 
-# 3. Add paths so Python can see everything
-sys.path.append(current_dir) # Allows seeing 'models'
-sys.path.append(parent_dir)  # Allows seeing 'training'
+#Add paths so Python can see everything
+sys.path.append(current_dir) 
+sys.path.append(parent_dir)  
 
 # Import your existing modules (assuming standard project structure)
 from models.unet import TinyUNet
