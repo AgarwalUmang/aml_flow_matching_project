@@ -4,7 +4,7 @@
 [![PyTorch 2.0+](https://img.shields.io/badge/pytorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-arXiv link to be updated upon confirmation of submission  
+arXiv link to be updated upon confirmation of submission, in the meantime, report is available at report.pdf
 
 A comprehensive comparison of three generative modeling paradigms—**DDPM**, **Conditional Flow Matching (CFM)**, and **MeanFlow**—with an extension to **image inpainting**. This project demonstrates that flow-based methods significantly outperform traditional diffusion, and that MeanFlow enables **50× faster inference** through one-step generation.
 
