@@ -10,3 +10,5 @@ results/Mean_Flow_200_old
 results/results_1.zip
 results/*/outputs_*/*9.pt
 outputs/*
+figures/*.pdf
+README2.md

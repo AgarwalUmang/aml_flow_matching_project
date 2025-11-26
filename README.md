@@ -12,7 +12,7 @@ A comprehensive comparison of three generative modeling paradigms—**DDPM**, **
   <img src="figures/generation_overall_metrics.png" width="600" alt="FID Comparison">
 </p>
 
-## Key Results
+##  Key Results
 
 | Method | FID ↓ | KID×1000 ↓ | NFE | Speed |
 |--------|-------|------------|-----|-------|
@@ -24,6 +24,135 @@ A comprehensive comparison of three generative modeling paradigms—**DDPM**, **
 - PSNR: +74% average improvement
 - SSIM: +43% average improvement
 - NMSE: -56% average reduction
+
+---
+
+##  Generated Samples
+
+### CFM Generated Images (50 steps, CFG=3.0)
+
+Our best-performing model generates high-quality class-conditional images:
+
+<p align="center">
+<table>
+<tr>
+<td align="center"><img src="figures/cfm_class_0.png" width="150"><br><b>Airplane</b></td>
+<td align="center"><img src="figures/cfm_class_1.png" width="150"><br><b>Automobile</b></td>
+<td align="center"><img src="figures/cfm_class_2.png" width="150"><br><b>Bird</b></td>
+<td align="center"><img src="figures/cfm_class_3.png" width="150"><br><b>Cat</b></td>
+<td align="center"><img src="figures/cfm_class_4.png" width="150"><br><b>Deer</b></td>
+</tr>
+<tr>
+<td align="center"><img src="figures/cfm_class_5.png" width="150"><br><b>Dog</b></td>
+<td align="center"><img src="figures/cfm_class_6.png" width="150"><br><b>Frog</b></td>
+<td align="center"><img src="figures/cfm_class_7.png" width="150"><br><b>Horse</b></td>
+<td align="center"><img src="figures/cfm_class_8.png" width="150"><br><b>Ship</b></td>
+<td align="center"><img src="figures/cfm_class_9.png" width="150"><br><b>Truck</b></td>
+</tr>
+</table>
+</p>
+
+### MeanFlow Generated Images (1 step only!)
+
+MeanFlow achieves comparable quality with **50× fewer function evaluations**:
+
+<p align="center">
+<table>
+<tr>
+<td align="center"><img src="figures/mean_flow_class_0_airplane.png" width="180"><br><b>Airplane</b></td>
+<td align="center"><img src="figures/mean_flow_class_1_automobile.png" width="180"><br><b>Automobile</b></td>
+<td align="center"><img src="figures/mean_flow_class_2_bird.png" width="180"><br><b>Bird</b></td>
+<td align="center"><img src="figures/mean_flow_class_3_cat.png" width="180"><br><b>Cat</b></td>
+</tr>
+<tr>
+<td align="center"><img src="figures/mean_flow_class_4_deer.png" width="180"><br><b>Deer</b></td>
+<td align="center"><img src="figures/mean_flow_class_5_dog.png" width="180"><br><b>Dog</b></td>
+<td align="center"><img src="figures/mean_flow_class_6_frog.png" width="180"><br><b>Frog</b></td>
+<td align="center"><img src="figures/mean_flow_class_7_horse.png" width="180"><br><b>Horse</b></td>
+</tr>
+<tr>
+<td align="center"><img src="figures/mean_flow_class_8_ship.png" width="180"><br><b>Ship</b></td>
+<td align="center"><img src="figures/mean_flow_class_9_truck.png" width="180"><br><b>Truck</b></td>
+<td align="center" colspan="2"><i>Single forward pass generation!</i></td>
+</tr>
+</table>
+</p>
+
+### DDPM Results (Training Failure)
+
+DDPM with our TinyUNet architecture fails to converge, even after 400 epochs:
+
+<p align="center">
+<img src="figures/ddpm_samples_epoch_399.png" width="400" alt="DDPM failure">
+<br><i>DDPM samples at epoch 399 — model fails to learn meaningful representations</i>
+</p>
+
+This explains the poor FID of 402.98. The failure is likely due to:
+- Insufficient timesteps (T=200 vs typical T=1000)
+- Architecture too small for noise prediction
+- Velocity matching (CFM) is easier to learn than noise prediction (DDPM)
+
+---
+
+##  Inpainting Results
+
+### Visual Comparison: Base Model vs Fine-tuned
+
+Fine-tuning dramatically improves inpainting quality. Each row shows: **Original → Masked → Base Model → Fine-tuned Model**
+
+#### Center Mask (16×16 square, 25% coverage)
+<p align="center">
+<img src="figures/comparison_center_labeled.png" width="600" alt="Center mask inpainting">
+</p>
+
+#### Random Bounding Box (variable size rectangles)
+<p align="center">
+<img src="figures/comparison_random_bbox_labeled.png" width="600" alt="Random bbox inpainting">
+</p>
+
+#### Irregular Brush Strokes (scattered patterns)
+<p align="center">
+<img src="figures/comparison_irregular_labeled.png" width="600" alt="Irregular mask inpainting">
+</p>
+
+#### Half Image (50% coverage - hardest case)
+<p align="center">
+<img src="figures/comparison_half_labeled.png" width="600" alt="Half image inpainting">
+</p>
+
+### Quantitative Improvement
+
+<p align="center">
+<img src="figures/inpainting_base_vs_finetuned.png" width="700" alt="Inpainting metrics comparison">
+</p>
+
+| Mask Type | NMSE (Base→FT) | PSNR (Base→FT) | SSIM (Base→FT) |
+|-----------|----------------|----------------|----------------|
+| Center | 2.37 → 1.06 (-55%) | 4.9 → 8.6 dB (+73%) | 0.29 → 0.42 (+45%) |
+| Random BBox | 2.48 → 1.00 (-60%) | 5.0 → 9.2 dB (+83%) | 0.32 → 0.46 (+45%) |
+| Irregular | 1.82 → 0.87 (-52%) | 6.0 → 9.2 dB (+55%) | 0.38 → 0.50 (+33%) |
+| Half Image | 2.60 → 1.18 (-55%) | 4.2 → 7.8 dB (+86%) | 0.24 → 0.37 (+53%) |
+
+### Per-Class Inpainting Performance
+
+<p align="center">
+<table>
+<tr>
+<td><img src="figures/inpainting_perclass_psnr_heatmap.png" width="400"><br><b>PSNR by Class & Mask Type</b></td>
+<td><img src="figures/inpainting_perclass_ssim_heatmap.png" width="400"><br><b>SSIM by Class & Mask Type</b></td>
+</tr>
+</table>
+</p>
+
+**Best performing classes:** Deer, Ship, Frog (simpler textures)  
+**Most challenging classes:** Dog, Truck, Cat (complex details)
+
+### Mask Difficulty Analysis
+
+<p align="center">
+<img src="figures/inpainting_mask_radar.png" width="400" alt="Mask difficulty radar">
+<br><i>Normalized performance across mask types (higher = better)</i>
+</p>
 
 ---
 
@@ -290,44 +419,32 @@ def inpaint(image, mask, model, steps=50):
 
 ---
 
-##  Detailed Results
+##  Generation Metrics
 
-### Generation Quality
+### Overall Performance
+
+<p align="center">
+  <img src="figures/generation_overall_metrics.png" width="700" alt="Overall FID/KID">
+</p>
+
+### Per-Class FID Analysis
 
 <p align="center">
   <img src="figures/generation_per_class_fid.png" width="700" alt="Per-class FID">
 </p>
 
-**Per-class observations:**
-- **Best:** Ship (FID 50.38), Truck (51.18) — simple geometry
-- **Worst:** Bird (79.66), Dog (77.77) — complex textures
-
-### Inpainting Performance
-
-<p align="center">
-  <img src="figures/inpainting_base_vs_finetuned.png" width="700" alt="Inpainting comparison">
-</p>
-
-| Mask Type | PSNR (Base→FT) | Improvement |
-|-----------|----------------|-------------|
-| Center | 4.9 → 8.6 dB | +73% |
-| Random BBox | 5.0 → 9.2 dB | +83% |
-| Irregular | 6.0 → 9.2 dB | +55% |
-| Half Image | 4.2 → 7.8 dB | +86% |
-
-### Qualitative Results
-
-**CFM vs MeanFlow Generation:**
-
-| CFM (50 steps) | MeanFlow (1 step) |
-|----------------|-------------------|
-| <img src="figures/cfm_class_8.png" width="200"> | <img src="figures/meanflow_class_8_ship.png" width="200"> |
-
-**Inpainting Before vs After Fine-tuning:**
-
-<p align="center">
-  <img src="figures/comparison_center_labeled.png" width="400" alt="Center mask comparison">
-</p>
+| Class | CFM FID | MeanFlow FID | Difficulty |
+|-------|---------|--------------|------------|
+| Ship | **50.38** | **59.83** | Easy |
+| Truck | 51.18 | 60.94 | Easy |
+| Automobile | 54.37 | 63.94 | Easy |
+| Horse | 57.58 | 67.24 | Medium |
+| Deer | 62.06 | 71.89 | Medium |
+| Airplane | 65.13 | 74.85 | Medium |
+| Frog | 71.41 | 82.16 | Medium |
+| Cat | 75.63 | 86.18 | Hard |
+| Dog | 77.77 | 88.32 | Hard |
+| Bird | **79.66** | **90.23** | Hard |
 
 ---
 
@@ -462,7 +579,11 @@ python scripts/visualize_all_results.py
 
 ---
 
+##  License
 
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
 
 ##  Contributing
 
@@ -484,5 +605,5 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ---
 
 <!-- <p align="center">
-  <b> If you find this project useful, please consider giving it a star! ⭐</b>
+  <b>⭐ If you find this project useful, please consider giving it a star! ⭐</b>
 </p> -->
